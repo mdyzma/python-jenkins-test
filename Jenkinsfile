@@ -27,9 +27,11 @@ pipeline {
         stage('Build environment') {
             steps {
                 echo "Building virtualenv"
-                sh  ''' conda create --yes -n ${BUILD_TAG} python
+                sh  ''' conda create --yes -n ${BUILD_TAG} python=3.6
                         source activate ${BUILD_TAG}
-                        pip install -r requirements/dev.txt
+                        conda install --file requirements/conda.txt
+                        pip install -r requirements/pip.txt
+                        
                     '''
             }
         }
@@ -41,7 +43,6 @@ pipeline {
                         radon raw --json irisvmpy > raw_report.json
                         radon cc --json irisvmpy > cc_report.json
                         radon mi --json irisvmpy > mi_report.json
-                        sloccount --duplicates --wide irisvmpy > sloccount.sc
                     '''
                 echo "Test coverage"
                 sh  ''' source activate ${BUILD_TAG}
